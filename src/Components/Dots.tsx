@@ -2,16 +2,12 @@ import { isMobile } from "react-device-detect";
 import { ariadne } from "@/vo/Ariadne";
 import Styles from "@/styles/Dots.module.scss";
 import { useCallback, useEffect, useRef } from "react";
-import { useMouse } from "@uidotdev/usehooks";
 
 export const Dots = () => {
-	const [mouse, ref] = useMouse();
-
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const canvasWidth = isMobile ? 4000 : 10000;
 	const canvasHeight = isMobile ? 4000 : 10000;
 
-	const frameRef = useRef(0);
 	const requestRef = useRef<number>(undefined);
 
 	const dots = ariadne;
@@ -20,19 +16,32 @@ export const Dots = () => {
 
 	const init = useCallback(() => {
 		for (let i = 0; i < dots.length; i++) {
-			// x, y, toX, toY, currentX, currentY, completeFlag
+			// x, y, toX, toY, currentX, currentY, startFlag, completeFlag, speed
 			dots[i][2] = dots[i][0] + offsetX;
 			dots[i][3] = dots[i][1] + offsetY;
-			dots[i][4] = Math.floor(Math.random() * window.innerWidth);
-			dots[i][5] = Math.floor(Math.random() * window.innerHeight);
+			dots[i][4] = Math.random() * window.innerWidth;
+			dots[i][5] = Math.random() * window.innerHeight;
 			dots[i][6] = 0;
+			dots[i][7] = Math.random() * 28 + 2;
+		}
+	}, [offsetX, offsetY]);
+
+	const breakInit = useCallback(() => {
+		for (let i = 0; i < dots.length; i++) {
+			// x, y, toX, toY
+			dots[i][4] = dots[i][2];
+			dots[i][5] = dots[i][3];
+			dots[i][6] = 0;
+			dots[i][7] = 4;
+
+			dots[i][2] = Math.random() * window.innerWidth;
+			dots[i][3] = Math.random() * window.innerHeight;
 		}
 	}, []);
 
 	const animate = useCallback(() => {
 		if (!canvasRef.current) {
 			requestRef.current = requestAnimationFrame(animate);
-			frameRef.current++;
 			return;
 		}
 
@@ -41,7 +50,6 @@ export const Dots = () => {
 
 		if (!ctx) {
 			requestRef.current = requestAnimationFrame(animate);
-			frameRef.current++;
 			return;
 		}
 
@@ -59,35 +67,44 @@ export const Dots = () => {
 			const distX = dots[i][2] - dots[i][4];
 			const distY = dots[i][3] - dots[i][5];
 
-			if (Math.abs(distX) < 1 && Math.abs(distY) < 1) {
+			if (Math.abs(distX) < 2 && Math.abs(distY) < 2) {
 				dots[i][4] = dots[i][2];
 				dots[i][5] = dots[i][3];
-				dots[i][6] = 1;
+				dots[i][6] = 0;
+				dots[i][7] = 1;
 			} else {
-				dots[i][4] = (dots[i][2] - dots[i][4]) / 4 + dots[i][4];
-				dots[i][5] = (dots[i][3] - dots[i][5]) / 4 + dots[i][5];
+				dots[i][4] = (dots[i][2] - dots[i][4]) / dots[i][7] + dots[i][4];
+				dots[i][5] = (dots[i][3] - dots[i][5]) / dots[i][7] + dots[i][5];
 			}
 		}
 
 		requestRef.current = requestAnimationFrame(animate);
-		frameRef.current++;
-	}, []);
+	}, [canvasWidth, canvasHeight]);
+
+	const click = useCallback(() => {
+		if (requestRef.current) {
+			cancelAnimationFrame(requestRef.current);
+		}
+
+		animate();
+	}, [animate]);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: Execute on mount only
 	useEffect(() => {
 		init();
-		animate();
+		window.addEventListener("click", click);
 
 		return () => {
 			if (requestRef.current) {
+				window.removeEventListener("click", click);
 				cancelAnimationFrame(requestRef.current);
 			}
 		};
 	}, []);
 
 	return (
-		// @ts-ignore
-		<div className={Styles.container} ref={ref}>
+		// @ts-expect-error
+		<div className={Styles.container}>
 			<canvas
 				id={"dots"}
 				width={canvasWidth}
