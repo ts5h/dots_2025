@@ -1,7 +1,7 @@
 import { isMobile } from "react-device-detect";
 import { ariadne } from "@/vo/Ariadne";
 import Styles from "@/styles/Dots.module.scss";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 export const Dots = () => {
 	const startedFlag = useRef(false);
@@ -11,8 +11,6 @@ export const Dots = () => {
 	const canvasHeight = isMobile ? 4000 : 10000;
 
 	const dots = ariadne;
-	const offsetX = useMemo(() => Math.floor((window.innerWidth - 300) / 2), []);
-	const offsetY = useMemo(() => Math.floor((window.innerHeight - 340) / 2), []);
 
 	const breakFlag = useRef(false);
 	const requestRef = useRef<number>(undefined);
@@ -20,8 +18,8 @@ export const Dots = () => {
 	const toInit = useCallback(() => {
 		for (let i = 0; i < dots.length; i++) {
 			// x, y, toX, toY, currentX, currentY, completeFlag, speed
-			dots[i][2] = dots[i][0] + offsetX;
-			dots[i][3] = dots[i][1] + offsetY;
+			dots[i][2] = dots[i][0] + Math.floor((window.innerWidth - 300) / 2);
+			dots[i][3] = dots[i][1] + Math.floor((window.innerHeight - 340) / 2);
 			dots[i][4] = !startedFlag.current
 				? Math.random() * window.innerWidth
 				: dots[i][4];
@@ -31,7 +29,7 @@ export const Dots = () => {
 			dots[i][6] = 0;
 			dots[i][7] = Math.random() * 23 + 2;
 		}
-	}, [offsetX, offsetY]);
+	}, []);
 
 	const breakInit = useCallback(() => {
 		for (let i = 0; i < dots.length; i++) {
