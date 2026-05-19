@@ -1,7 +1,7 @@
 import { isMobile } from "react-device-detect";
 import { ariadne } from "@/vo/Ariadne";
 import Styles from "@/styles/Dots.module.scss";
-import {useCallback, useEffect, useMemo,useRef} from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 export const Dots = () => {
 	const startedFlag = useRef(false);
@@ -17,16 +17,17 @@ export const Dots = () => {
 	const breakFlag = useRef(false);
 	const requestRef = useRef<number>(undefined);
 
-	const waitTime = 3;
-	const waitRef = useRef(waitTime);
-
 	const toInit = useCallback(() => {
 		for (let i = 0; i < dots.length; i++) {
 			// x, y, toX, toY, currentX, currentY, completeFlag, speed
 			dots[i][2] = dots[i][0] + offsetX;
 			dots[i][3] = dots[i][1] + offsetY;
-			dots[i][4] = !startedFlag.current ? Math.random() * window.innerWidth : dots[i][4];
-			dots[i][5] = !startedFlag.current ? Math.random() * window.innerHeight: dots[i][5];
+			dots[i][4] = !startedFlag.current
+				? Math.random() * window.innerWidth
+				: dots[i][4];
+			dots[i][5] = !startedFlag.current
+				? Math.random() * window.innerHeight
+				: dots[i][5];
 			dots[i][6] = 0;
 			dots[i][7] = Math.random() * 23 + 2;
 		}
@@ -83,17 +84,12 @@ export const Dots = () => {
 		}
 
 		if (breakFlag.current && dots[0][6]) {
-			waitRef.current--;
-
-			if (waitRef.current <= 0) {
-				toInit();
-				waitRef.current = waitTime;
-				breakFlag.current = false;
-			}
+			toInit();
+			breakFlag.current = false;
 		}
 
 		requestRef.current = requestAnimationFrame(animate);
-	}, [canvasWidth, canvasHeight, dots, toInit]);
+	}, [canvasWidth, canvasHeight, toInit]);
 
 	const click = useCallback(() => {
 		if (requestRef.current) {
@@ -109,7 +105,7 @@ export const Dots = () => {
 		if (!startedFlag.current) {
 			startedFlag.current = true;
 		}
-	}, [animate, breakInit, toInit]);
+	}, [animate, breakInit]);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: Execute on mount only
 	useEffect(() => {
