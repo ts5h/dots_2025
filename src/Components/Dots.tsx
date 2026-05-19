@@ -1,42 +1,47 @@
 import { isMobile } from "react-device-detect";
 import { ariadne } from "@/vo/Ariadne";
 import Styles from "@/styles/Dots.module.scss";
-import { useCallback, useEffect, useRef } from "react";
+import {useCallback, useEffect, useMemo,useRef} from "react";
 
 export const Dots = () => {
+	const startedFlag = useRef(false);
+
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const canvasWidth = isMobile ? 4000 : 10000;
 	const canvasHeight = isMobile ? 4000 : 10000;
 
+	const dots = ariadne;
+	const offsetX = useMemo(() => Math.floor((window.innerWidth - 300) / 2), []);
+	const offsetY = useMemo(() => Math.floor((window.innerHeight - 340) / 2), []);
+
+	const breakFlag = useRef(false);
 	const requestRef = useRef<number>(undefined);
 
-	const dots = ariadne;
-	const offsetX = Math.floor((window.innerWidth - 300) / 2);
-	const offsetY = Math.floor((window.innerHeight - 340) / 2);
+	const waitTime = 3;
+	const waitRef = useRef(waitTime);
 
-	const init = useCallback(() => {
+	const toInit = useCallback(() => {
 		for (let i = 0; i < dots.length; i++) {
-			// x, y, toX, toY, currentX, currentY, startFlag, completeFlag, speed
+			// x, y, toX, toY, currentX, currentY, completeFlag, speed
 			dots[i][2] = dots[i][0] + offsetX;
 			dots[i][3] = dots[i][1] + offsetY;
-			dots[i][4] = Math.random() * window.innerWidth;
-			dots[i][5] = Math.random() * window.innerHeight;
+			dots[i][4] = !startedFlag.current ? Math.random() * window.innerWidth : dots[i][4];
+			dots[i][5] = !startedFlag.current ? Math.random() * window.innerHeight: dots[i][5];
 			dots[i][6] = 0;
-			dots[i][7] = Math.random() * 28 + 2;
+			dots[i][7] = Math.random() * 23 + 2;
 		}
 	}, [offsetX, offsetY]);
 
 	const breakInit = useCallback(() => {
 		for (let i = 0; i < dots.length; i++) {
-			// x, y, toX, toY
-			dots[i][4] = dots[i][2];
-			dots[i][5] = dots[i][3];
-			dots[i][6] = 0;
-			dots[i][7] = 4;
-
 			dots[i][2] = Math.random() * window.innerWidth;
 			dots[i][3] = Math.random() * window.innerHeight;
+
+			dots[i][6] = 0;
+			dots[i][7] = 4; // speed
 		}
+
+		breakFlag.current = true;
 	}, []);
 
 	const animate = useCallback(() => {
@@ -70,40 +75,56 @@ export const Dots = () => {
 			if (Math.abs(distX) < 2 && Math.abs(distY) < 2) {
 				dots[i][4] = dots[i][2];
 				dots[i][5] = dots[i][3];
-				dots[i][6] = 0;
-				dots[i][7] = 1;
+				dots[i][6] = 1;
 			} else {
 				dots[i][4] = (dots[i][2] - dots[i][4]) / dots[i][7] + dots[i][4];
 				dots[i][5] = (dots[i][3] - dots[i][5]) / dots[i][7] + dots[i][5];
 			}
 		}
 
+		if (breakFlag.current && dots[0][6]) {
+			waitRef.current--;
+
+			if (waitRef.current <= 0) {
+				toInit();
+				waitRef.current = waitTime;
+				breakFlag.current = false;
+			}
+		}
+
 		requestRef.current = requestAnimationFrame(animate);
-	}, [canvasWidth, canvasHeight]);
+	}, [canvasWidth, canvasHeight, dots, toInit]);
 
 	const click = useCallback(() => {
 		if (requestRef.current) {
 			cancelAnimationFrame(requestRef.current);
 		}
 
+		if (startedFlag.current) {
+			breakInit();
+		}
+
 		animate();
-	}, [animate]);
+
+		if (!startedFlag.current) {
+			startedFlag.current = true;
+		}
+	}, [animate, breakInit, toInit]);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: Execute on mount only
 	useEffect(() => {
-		init();
-		window.addEventListener("click", click);
+		toInit();
+		document.addEventListener("click", click);
 
 		return () => {
 			if (requestRef.current) {
-				window.removeEventListener("click", click);
+				document.removeEventListener("click", click);
 				cancelAnimationFrame(requestRef.current);
 			}
 		};
 	}, []);
 
 	return (
-		// @ts-expect-error
 		<div className={Styles.container}>
 			<canvas
 				id={"dots"}
