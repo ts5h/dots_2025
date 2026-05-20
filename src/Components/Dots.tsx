@@ -1,9 +1,9 @@
+import { useCallback, useEffect, useRef } from "react";
 import { isMobile } from "react-device-detect";
 import { ariadne } from "@/vo/Ariadne";
 import { laocoon } from "@/vo/Laocoon";
-import Styles from "@/styles/Dots.module.scss";
-import { useCallback, useEffect, useRef } from "react";
 import { getEasedCoordinates } from "@/functions/getEasedCoordinates";
+import Styles from "@/styles/Dots.module.scss";
 
 export const Dots = () => {
 	const startedFlag = useRef(false);
@@ -33,7 +33,7 @@ export const Dots = () => {
 			dots[i][6] = dots[i][2];
 			dots[i][7] = dots[i][3];
 
-			dots[i][8] = Math.floor(Math.random() * 249 + 1);
+			dots[i][8] = Math.floor(Math.random() * 220 + 20);
 			dots[i][9] = 0;
 		}
 	}, []);
@@ -116,7 +116,6 @@ export const Dots = () => {
 		}
 
 		dots = dotsArrays[dotsNumber.current];
-
 		toInit();
 		breakInit();
 
@@ -127,13 +126,13 @@ export const Dots = () => {
 	useEffect(() => {
 		toInit();
 		requestRef.current = requestAnimationFrame(animate);
-
 		document.addEventListener("click", click);
 
 		return () => {
 			if (requestRef.current) {
 				document.removeEventListener("click", click);
 				cancelAnimationFrame(requestRef.current);
+				requestRef.current = undefined;
 			}
 		};
 	}, []);

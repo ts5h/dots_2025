@@ -61,10 +61,10 @@ export const getEasedCoordinates = (
 	endY: number,
 	duration: number = 1000,
 	currentDuration: number = 0,
-	isBreak: boolean,
+	isBreaking: boolean,
 ) => {
 	const progress = Math.min(currentDuration / duration, 1);
-	const easedProgress = isBreak
+	const easedProgress = isBreaking
 		? easeOutQuad(progress)
 		: easeInOutQuad(progress);
 
