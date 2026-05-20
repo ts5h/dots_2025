@@ -54,15 +54,25 @@ const easeInOutQuad = (t: number) => {
 	return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 };
 
-export const getEasedCoordinates = (
-	startX: number,
-	startY: number,
-	endX: number,
-	endY: number,
-	duration: number = 1000,
-	currentDuration: number = 0,
-	isBreaking: boolean,
-) => {
+type Props = {
+	startX: number;
+	startY: number;
+	endX: number;
+	endY: number;
+	duration: number;
+	currentDuration: number;
+	isBreaking: boolean;
+};
+
+export const getEasedCoordinates = ({
+	startX,
+	startY,
+	endX,
+	endY,
+	duration,
+	currentDuration,
+	isBreaking,
+}: Props) => {
 	const progress = Math.min(currentDuration / duration, 1);
 	const easedProgress = isBreaking
 		? easeOutQuad(progress)

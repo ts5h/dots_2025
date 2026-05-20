@@ -75,15 +75,15 @@ export const Dots = () => {
 		ctx.fillStyle = "#000";
 
 		for (let i = 0; i < dots.length; i++) {
-			const { currentX, currentY } = getEasedCoordinates(
-				dots[i][2],
-				dots[i][3],
-				dots[i][4],
-				dots[i][5],
-				dots[i][8],
-				dots[i][9],
-				breakFlag.current,
-			);
+			const { currentX, currentY } = getEasedCoordinates({
+				startX: dots[i][2],
+				startY: dots[i][3],
+				endX: dots[i][4],
+				endY: dots[i][5],
+				duration: dots[i][8],
+				currentDuration: dots[i][9],
+				isBreaking: breakFlag.current,
+			});
 
 			ctx.fillRect(currentX, currentY, 1, 1);
 			dots[i][6] = currentX;
