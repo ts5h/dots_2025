@@ -12,20 +12,35 @@ export const Dots = () => {
 	const canvasWidth = isMobile ? 4000 : 10000;
 	const canvasHeight = isMobile ? 4000 : 10000;
 
-	const dotsNumber = useRef(0);
-	const dotsArrays = [ariadne, laocoon];
-	let dots = dotsArrays[dotsNumber.current];
-
 	const breakFlag = useRef(false);
 	const requestRef = useRef<number>(undefined);
 
-	const toInit = useCallback(() => {
-		const max = Math.max(window.innerWidth, window.innerHeight);
+	const dotsNumber = useRef(0);
 
+	const getDots = useCallback((isReset: boolean = false) => {
+		const dotsArrays = [ariadne, laocoon];
+
+		if (isReset) {
+			dotsNumber.current++;
+			if (dotsNumber.current > dotsArrays.length - 1) {
+				dotsNumber.current = 0;
+			}
+		}
+
+		return dotsArrays[dotsNumber.current];
+	}, []);
+
+	const getMax = useCallback(() => {
+		const max = Math.max(window.innerWidth, window.innerHeight);
+		return Math.random() * (max + 20) - 10;
+	}, []);
+
+	const toInit = useCallback(() => {
+		const dots = getDots();
 		for (let i = 0; i < dots.length; i++) {
 			// x, y, startX, startY, endX, endY, currentX, currentY, duration, currentDuration
-			dots[i][2] = !startedFlag.current ? Math.random() * max : dots[i][4];
-			dots[i][3] = !startedFlag.current ? Math.random() * max : dots[i][5];
+			dots[i][2] = !startedFlag.current ? getMax() : dots[i][4];
+			dots[i][3] = !startedFlag.current ? getMax() : dots[i][5];
 
 			dots[i][4] = dots[i][0] + Math.floor((window.innerWidth - 300) / 2);
 			dots[i][5] = dots[i][1] + Math.floor((window.innerHeight - 340) / 2);
@@ -36,26 +51,25 @@ export const Dots = () => {
 			dots[i][8] = Math.floor(Math.random() * 220 + 20);
 			dots[i][9] = 0;
 		}
-	}, []);
+	}, [getDots, getMax]);
 
 	const breakInit = useCallback(() => {
-		const max = Math.max(window.innerWidth, window.innerHeight);
-
+		const dots = getDots();
 		for (let i = 0; i < dots.length; i++) {
 			// x, y, startX, startY, endX, endY, currentX, currentY, duration, currentDuration
 			dots[i][2] = dots[i][6];
 			dots[i][3] = dots[i][7];
 
-			dots[i][4] = Math.random() * max;
-			dots[i][5] = Math.random() * max;
+			dots[i][4] = getMax();
+			dots[i][5] = getMax();
 
-			dots[i][8] = 20;
+			dots[i][8] = 24;
 			dots[i][9] = 0;
 		}
 
 		breakFlag.current = true;
 		startedFlag.current = true;
-	}, []);
+	}, [getDots, getMax]);
 
 	const animate = useCallback(() => {
 		if (!canvasRef.current) {
@@ -70,6 +84,8 @@ export const Dots = () => {
 			requestRef.current = requestAnimationFrame(animate);
 			return;
 		}
+
+		const dots = getDots();
 
 		ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 		ctx.fillStyle = "#000";
@@ -86,13 +102,14 @@ export const Dots = () => {
 			});
 
 			ctx.fillRect(currentX, currentY, 1, 1);
+
 			dots[i][6] = currentX;
 			dots[i][7] = currentY;
 
 			if (dots[i][8] > dots[i][9]) dots[i][9]++;
 		}
 
-		// Set dots after break
+		// Move designated positions after break
 		if (
 			breakFlag.current &&
 			dots[dots.length - 1][8] === dots[dots.length - 1][9]
@@ -102,7 +119,7 @@ export const Dots = () => {
 		}
 
 		requestRef.current = requestAnimationFrame(animate);
-	}, [toInit, canvasWidth, canvasHeight]);
+	}, [toInit, getDots, canvasWidth, canvasHeight]);
 
 	const click = useCallback(() => {
 		if (requestRef.current) {
@@ -110,17 +127,12 @@ export const Dots = () => {
 			requestRef.current = undefined;
 		}
 
-		dotsNumber.current++;
-		if (dotsNumber.current > dotsArrays.length - 1) {
-			dotsNumber.current = 0;
-		}
-
-		dots = dotsArrays[dotsNumber.current];
+		getDots(true);
 		toInit();
 		breakInit();
 
 		requestRef.current = requestAnimationFrame(animate);
-	}, [animate, toInit, breakInit]);
+	}, [animate, toInit, breakInit, getDots]);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: Execute on mount only
 	useEffect(() => {
