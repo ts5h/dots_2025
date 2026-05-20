@@ -1,7 +1,9 @@
 import { isMobile } from "react-device-detect";
 import { ariadne } from "@/vo/Ariadne";
+import { laocoon } from "@/vo/Laocoon";
 import Styles from "@/styles/Dots.module.scss";
 import { useCallback, useEffect, useRef } from "react";
+import { getEasedCoordinates } from "@/functions/getEasedCoordinates";
 
 export const Dots = () => {
 	const startedFlag = useRef(false);
@@ -10,37 +12,49 @@ export const Dots = () => {
 	const canvasWidth = isMobile ? 4000 : 10000;
 	const canvasHeight = isMobile ? 4000 : 10000;
 
-	const dots = ariadne;
+	const dotsNumber = useRef(0);
+	const dotsArrays = [ariadne, laocoon];
+	let dots = dotsArrays[dotsNumber.current];
 
 	const breakFlag = useRef(false);
 	const requestRef = useRef<number>(undefined);
 
 	const toInit = useCallback(() => {
+		const max = Math.max(window.innerWidth, window.innerHeight);
+
 		for (let i = 0; i < dots.length; i++) {
-			// x, y, toX, toY, currentX, currentY, completeFlag, speed
-			dots[i][2] = dots[i][0] + Math.floor((window.innerWidth - 300) / 2);
-			dots[i][3] = dots[i][1] + Math.floor((window.innerHeight - 340) / 2);
-			dots[i][4] = !startedFlag.current
-				? Math.random() * window.innerWidth
-				: dots[i][4];
-			dots[i][5] = !startedFlag.current
-				? Math.random() * window.innerHeight
-				: dots[i][5];
-			dots[i][6] = 0;
-			dots[i][7] = Math.random() * 23 + 2;
+			// x, y, startX, startY, endX, endY, currentX, currentY, duration, currentDuration
+			dots[i][2] = !startedFlag.current ? Math.random() * max : dots[i][4];
+			dots[i][3] = !startedFlag.current ? Math.random() * max : dots[i][5];
+
+			dots[i][4] = dots[i][0] + Math.floor((window.innerWidth - 300) / 2);
+			dots[i][5] = dots[i][1] + Math.floor((window.innerHeight - 340) / 2);
+
+			dots[i][6] = dots[i][2];
+			dots[i][7] = dots[i][3];
+
+			dots[i][8] = Math.floor(Math.random() * 249 + 1);
+			dots[i][9] = 0;
 		}
 	}, []);
 
 	const breakInit = useCallback(() => {
-		for (let i = 0; i < dots.length; i++) {
-			dots[i][2] = Math.random() * window.innerWidth;
-			dots[i][3] = Math.random() * window.innerHeight;
+		const max = Math.max(window.innerWidth, window.innerHeight);
 
-			dots[i][6] = 0;
-			dots[i][7] = 4; // speed
+		for (let i = 0; i < dots.length; i++) {
+			// x, y, startX, startY, endX, endY, currentX, currentY, duration, currentDuration
+			dots[i][2] = dots[i][6];
+			dots[i][3] = dots[i][7];
+
+			dots[i][4] = Math.random() * max;
+			dots[i][5] = Math.random() * max;
+
+			dots[i][8] = 20;
+			dots[i][9] = 0;
 		}
 
 		breakFlag.current = true;
+		startedFlag.current = true;
 	}, []);
 
 	const animate = useCallback(() => {
@@ -61,53 +75,59 @@ export const Dots = () => {
 		ctx.fillStyle = "#000";
 
 		for (let i = 0; i < dots.length; i++) {
-			const currentX = dots[i][4];
-			const currentY = dots[i][5];
+			const { currentX, currentY } = getEasedCoordinates(
+				dots[i][2],
+				dots[i][3],
+				dots[i][4],
+				dots[i][5],
+				dots[i][8],
+				dots[i][9],
+				breakFlag.current,
+			);
 
 			ctx.fillRect(currentX, currentY, 1, 1);
+			dots[i][6] = currentX;
+			dots[i][7] = currentY;
 
-			if (dots[i][6]) continue;
-
-			const distX = dots[i][2] - dots[i][4];
-			const distY = dots[i][3] - dots[i][5];
-
-			if (Math.abs(distX) < 2 && Math.abs(distY) < 2) {
-				dots[i][4] = dots[i][2];
-				dots[i][5] = dots[i][3];
-				dots[i][6] = 1;
-			} else {
-				dots[i][4] = (dots[i][2] - dots[i][4]) / dots[i][7] + dots[i][4];
-				dots[i][5] = (dots[i][3] - dots[i][5]) / dots[i][7] + dots[i][5];
-			}
+			if (dots[i][8] > dots[i][9]) dots[i][9]++;
 		}
 
-		if (breakFlag.current && dots[0][6]) {
+		// Set dots after break
+		if (
+			breakFlag.current &&
+			dots[dots.length - 1][8] === dots[dots.length - 1][9]
+		) {
 			toInit();
 			breakFlag.current = false;
 		}
 
 		requestRef.current = requestAnimationFrame(animate);
-	}, [canvasWidth, canvasHeight, toInit]);
+	}, [toInit, canvasWidth, canvasHeight]);
 
 	const click = useCallback(() => {
 		if (requestRef.current) {
 			cancelAnimationFrame(requestRef.current);
+			requestRef.current = undefined;
 		}
 
-		if (startedFlag.current) {
-			breakInit();
+		dotsNumber.current++;
+		if (dotsNumber.current > dotsArrays.length - 1) {
+			dotsNumber.current = 0;
 		}
 
-		animate();
+		dots = dotsArrays[dotsNumber.current];
 
-		if (!startedFlag.current) {
-			startedFlag.current = true;
-		}
-	}, [animate, breakInit]);
+		toInit();
+		breakInit();
+
+		requestRef.current = requestAnimationFrame(animate);
+	}, [animate, toInit, breakInit]);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: Execute on mount only
 	useEffect(() => {
 		toInit();
+		requestRef.current = requestAnimationFrame(animate);
+
 		document.addEventListener("click", click);
 
 		return () => {
