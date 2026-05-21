@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import { isMobile } from "react-device-detect";
+import { agrippa } from "@/vo/Agrippa";
 import { ariadne } from "@/vo/Ariadne";
 import { laocoon } from "@/vo/Laocoon";
-import { agrippa } from "@/vo/Agrippa.ts";
 import { getEasedCoordinates } from "@/functions/getEasedCoordinates";
 import Styles from "@/styles/Dots.module.scss";
 
@@ -40,10 +40,9 @@ export const Dots = () => {
 
 	const dotsNumber = useRef(0);
 	const dotsArray = useMemo(() => [agrippa, ariadne, laocoon], []);
+	const [dots, setDots] = useState(dotsArray[0]);
 
-	let dots = dotsArray[0];
-
-	const setDots = useCallback(
+	const setDotsArray = useCallback(
 		(isInit: boolean = false) => {
 			const tmpDots = dots;
 
@@ -77,7 +76,7 @@ export const Dots = () => {
 				const startX = dotsArray[num][i][0];
 				const startY = dotsArray[num][i][1];
 
-				// x, y, startX, startY, endX, endY, currentX, currentY, duration, currentDuration, num
+				// x, y, startX, startY, endX, endY, currentX, currentY, duration, currentDuration
 				tmpArray[0] = startX;
 				tmpArray[1] = startY;
 
@@ -93,12 +92,10 @@ export const Dots = () => {
 				tmpArray[8] = Math.floor(Math.random() * 220 + 20);
 				tmpArray[9] = 0;
 
-				tmpArray[10] = dotsNumber.current;
-
 				tmpDots[i] = tmpArray;
 			}
 
-			dots = tmpDots;
+			setDots(tmpDots);
 		},
 		[getMax, dotsArray, dots],
 	);
@@ -165,12 +162,12 @@ export const Dots = () => {
 			breakFlag.current &&
 			dots[dots.length - 1][8] <= dots[dots.length - 1][9]
 		) {
-			setDots(false);
+			setDotsArray(false);
 			breakFlag.current = false;
 		}
 
 		requestRef.current = requestAnimationFrame(animate);
-	}, [canvasWidth, canvasHeight, setDots, dots]);
+	}, [canvasWidth, canvasHeight, setDotsArray, dots]);
 
 	const click = useCallback(() => {
 		if (requestRef.current) {
@@ -183,7 +180,7 @@ export const Dots = () => {
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: Execute on mount only
 	useEffect(() => {
-		setDots(true);
+		setDotsArray(true);
 		requestRef.current = requestAnimationFrame(animate);
 		document.addEventListener("click", click);
 
