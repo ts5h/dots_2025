@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { isMobile } from "react-device-detect";
 import { ariadne } from "@/vo/Ariadne";
 import { laocoon } from "@/vo/Laocoon";
+import { agrippa } from "@/vo/Agrippa.ts";
 import { getEasedCoordinates } from "@/functions/getEasedCoordinates";
 import Styles from "@/styles/Dots.module.scss";
 
@@ -17,18 +18,22 @@ export const Dots = () => {
 
 	const dotsNumber = useRef(0);
 
-	const getDots = useCallback((isReset: boolean = false) => {
-		const dotsArrays = [ariadne, laocoon];
+	const dotsArrays = useMemo(() => [agrippa, ariadne, laocoon], []);
 
-		if (isReset) {
-			dotsNumber.current++;
-			if (dotsNumber.current > dotsArrays.length - 1) {
-				dotsNumber.current = 0;
+	const getDots = useCallback(
+		(isReset: boolean = false) => {
+			if (isReset) {
+				dotsNumber.current++;
+
+				if (dotsNumber.current > dotsArrays.length - 1) {
+					dotsNumber.current = 0;
+				}
 			}
-		}
 
-		return dotsArrays[dotsNumber.current];
-	}, []);
+			return dotsArrays[dotsNumber.current];
+		},
+		[dotsArrays],
+	);
 
 	const getMax = useCallback(() => {
 		const max = Math.max(window.innerWidth, window.innerHeight);
@@ -68,7 +73,6 @@ export const Dots = () => {
 		}
 
 		breakFlag.current = true;
-		startedFlag.current = true;
 	}, [getDots, getMax]);
 
 	const animate = useCallback(() => {
@@ -131,6 +135,7 @@ export const Dots = () => {
 		toInit();
 		breakInit();
 
+		startedFlag.current = true;
 		requestRef.current = requestAnimationFrame(animate);
 	}, [animate, toInit, breakInit, getDots]);
 
