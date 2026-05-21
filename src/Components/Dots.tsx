@@ -135,6 +135,7 @@ export const Dots = () => {
 		toInit();
 		breakInit();
 
+		// FIXME: flag position
 		startedFlag.current = true;
 		requestRef.current = requestAnimationFrame(animate);
 	}, [animate, toInit, breakInit, getDots]);
