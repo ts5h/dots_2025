@@ -77,7 +77,7 @@ export const Dots = () => {
 				const startX = dotsArray[num][i][0];
 				const startY = dotsArray[num][i][1];
 
-				// x, y, startX, startY, endX, endY, currentX, currentY, duration, currentDuration
+				// x, y, startX, startY, endX, endY, currentX, currentY, duration, currentDuration, num
 				tmpArray[0] = startX;
 				tmpArray[1] = startY;
 
@@ -93,6 +93,8 @@ export const Dots = () => {
 				tmpArray[8] = Math.floor(Math.random() * 220 + 20);
 				tmpArray[9] = 0;
 
+				tmpArray[10] = dotsNumber.current;
+
 				tmpDots[i] = tmpArray;
 			}
 
@@ -105,7 +107,7 @@ export const Dots = () => {
 		for (let i = 0; i < dots.length; i++) {
 			const { x, y } = getMax(false);
 
-			// x, y, startX, startY, endX, endY, currentX, currentY, duration, currentDuration
+			// x, y, startX, startY, endX, endY, currentX, currentY, duration, currentDuration, num
 			dots[i][2] = dots[i][6];
 			dots[i][3] = dots[i][7];
 
@@ -161,7 +163,7 @@ export const Dots = () => {
 		// Move designated positions after break
 		if (
 			breakFlag.current &&
-			dots[dots.length - 1][8] === dots[dots.length - 1][9]
+			dots[dots.length - 1][8] <= dots[dots.length - 1][9]
 		) {
 			setDots(false);
 			breakFlag.current = false;
