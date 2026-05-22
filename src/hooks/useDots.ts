@@ -1,16 +1,16 @@
 import { useCallback, useMemo, useRef } from "react";
-import { agrippa } from "@/vo/Agrippa";
-import { ariadne } from "@/vo/Ariadne";
-import { laocoon } from "@/vo/Laocoon";
+import { isMobile, isTablet } from "react-device-detect";
+import { Agrippa } from "@/vo/Agrippa";
+import { Ariadne } from "@/vo/Ariadne";
+import { Laocoon } from "@/vo/Laocoon";
 
 export const useDots = () => {
 	const dots = useRef<number[][]>([]);
 
 	const dotsNumber = useRef(0);
-	const dotsArray = useMemo(() => [agrippa, ariadne, laocoon], []);
+	const dotsArray = useMemo(() => [Agrippa, Ariadne, Laocoon], []);
 
 	const getMax = useCallback((isOutside: boolean = false) => {
-		const max = Math.max(window.innerWidth, window.innerHeight);
 		let x: number;
 		let y: number;
 
@@ -20,14 +20,14 @@ export const useDots = () => {
 
 			if (Math.floor(Math.random() * 2) === 1) {
 				x = tmpX < 0 ? tmpX : window.innerWidth + tmpX;
-				y = Math.random() * (max - 40) - 20;
+				y = Math.random() * (window.innerHeight + 40) - 20;
 			} else {
-				x = Math.random() * (max - 40) - 20;
+				x = Math.random() * (window.innerWidth + 40) - 20;
 				y = tmpY < 0 ? tmpY : window.innerHeight + tmpY;
 			}
 		} else {
-			x = Math.random() * (max - 40) - 20;
-			y = Math.random() * (max - 40) - 20;
+			x = Math.random() * (window.innerWidth + 40) - 20;
+			y = Math.random() * (window.innerHeight + 40) - 20;
 		}
 
 		return { x, y };
@@ -80,7 +80,7 @@ export const useDots = () => {
 					currentX,
 					currentY,
 
-					Math.floor(Math.random() * 220 + 20),
+					isMobile && !isTablet ? Math.floor(Math.random() * 180 + 20) : Math.floor(Math.random() * 220 + 20),
 					0,
 				);
 
