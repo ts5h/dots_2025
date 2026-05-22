@@ -11,7 +11,7 @@ export const useDots = () => {
 
 	const dotsNumber = useRef(0);
 	const dotsArray = useMemo(
-		() => [Agrippa, Hermes, Ariadne, Laocoon, Venus],
+		() => [Ariadne, Agrippa, Laocoon, Venus, Hermes],
 		[],
 	);
 
