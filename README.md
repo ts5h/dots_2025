@@ -1,5 +1,14 @@
 # Dots - 2025
 
+https://0bjekt.co/2025/dots
+
+A work.  
+*I don't think you should use the code from this project as a reference.
+
+
+----
+## VIte Auto-Generated Description 
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
