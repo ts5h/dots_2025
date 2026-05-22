@@ -4,36 +4,36 @@ import { AiFillGithub } from "react-icons/ai";
 import Styles from "@/styles/Menu.module.scss";
 
 export const MenuButtonGitHub = () => {
-  const [isHover, setIsHover] = useState(false);
+	const [isHover, setIsHover] = useState(false);
 
-  const handleHover = (state: boolean) => {
-    if (isMobile) return;
-    setIsHover(state);
-  };
+	const handleHover = (state: boolean) => {
+		if (isMobile) return;
+		setIsHover(state);
+	};
 
-  const handleTouch = (state: boolean) => {
-    if (!isMobile) return;
-    setIsHover(state);
-  };
+	const handleTouch = (state: boolean) => {
+		if (!isMobile) return;
+		setIsHover(state);
+	};
 
-  const handleClick = () => {
-    window.open("https://github.com/ts5h/dots");
-  };
+	const handleClick = () => {
+		window.open("https://github.com/ts5h/dots");
+	};
 
-  return (
-    <button
-      type="button"
-      onMouseOver={() => handleHover(true)}
-      onMouseOut={() => handleHover(false)}
-      onFocus={() => handleHover(true)}
-      onBlur={() => handleHover(false)}
-      onTouchStart={() => handleTouch(true)}
-      onTouchEnd={() => handleTouch(false)}
-      onClick={handleClick}
-      className={isHover ? Styles.on : ""}
-      title="GitHub"
-    >
-      <AiFillGithub className={Styles.icon} />
-    </button>
-  );
+	return (
+		<button
+			type="button"
+			onMouseOver={() => handleHover(true)}
+			onMouseOut={() => handleHover(false)}
+			onFocus={() => handleHover(true)}
+			onBlur={() => handleHover(false)}
+			onTouchStart={() => handleTouch(true)}
+			onTouchEnd={() => handleTouch(false)}
+			onClick={handleClick}
+			className={isHover ? Styles.on : ""}
+			title="GitHub"
+		>
+			<AiFillGithub className={Styles.icon} />
+		</button>
+	);
 };
