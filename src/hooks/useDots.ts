@@ -3,12 +3,13 @@ import { isMobile, isTablet } from "react-device-detect";
 import { Agrippa } from "@/vo/Agrippa";
 import { Ariadne } from "@/vo/Ariadne";
 import { Laocoon } from "@/vo/Laocoon";
+import { Hermes } from "@/vo/Hermes";
 
 export const useDots = () => {
 	const dots = useRef<number[][]>([]);
 
 	const dotsNumber = useRef(0);
-	const dotsArray = useMemo(() => [Agrippa, Ariadne, Laocoon], []);
+	const dotsArray = useMemo(() => [Agrippa, Hermes, Ariadne, Laocoon], []);
 
 	const getMax = useCallback((isOutside: boolean = false) => {
 		let x: number;
