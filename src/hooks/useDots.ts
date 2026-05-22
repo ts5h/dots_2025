@@ -4,12 +4,16 @@ import { Agrippa } from "@/vo/Agrippa";
 import { Ariadne } from "@/vo/Ariadne";
 import { Laocoon } from "@/vo/Laocoon";
 import { Hermes } from "@/vo/Hermes";
+import { Venus } from "@/vo/Venus";
 
 export const useDots = () => {
 	const dots = useRef<number[][]>([]);
 
 	const dotsNumber = useRef(0);
-	const dotsArray = useMemo(() => [Agrippa, Hermes, Ariadne, Laocoon], []);
+	const dotsArray = useMemo(
+		() => [Agrippa, Hermes, Ariadne, Laocoon, Venus],
+		[],
+	);
 
 	const getMax = useCallback((isOutside: boolean = false) => {
 		let x: number;
