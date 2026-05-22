@@ -1,4 +1,4 @@
-export const ariadne = [
+export const Ariadne = [
 	[154, 3],
 	[156, 3],
 	[158, 3],

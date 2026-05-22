@@ -1,14 +1,14 @@
 import { useCallback, useMemo, useRef } from "react";
 import { isMobile, isTablet } from "react-device-detect";
-import { agrippa } from "@/vo/Agrippa";
-import { ariadne } from "@/vo/Ariadne";
-import { laocoon } from "@/vo/Laocoon";
+import { Agrippa } from "@/vo/Agrippa";
+import { Ariadne } from "@/vo/Ariadne";
+import { Laocoon } from "@/vo/Laocoon";
 
 export const useDots = () => {
 	const dots = useRef<number[][]>([]);
 
 	const dotsNumber = useRef(0);
-	const dotsArray = useMemo(() => [agrippa, ariadne, laocoon], []);
+	const dotsArray = useMemo(() => [Agrippa, Ariadne, Laocoon], []);
 
 	const getMax = useCallback((isOutside: boolean = false) => {
 		let x: number;
@@ -80,7 +80,9 @@ export const useDots = () => {
 					currentX,
 					currentY,
 
-					isMobile && !isTablet ? Math.floor(Math.random() * 180 + 20) : Math.floor(Math.random() * 220 + 20),
+					isMobile && !isTablet
+						? Math.floor(Math.random() * 180 + 20)
+						: Math.floor(Math.random() * 220 + 20),
 					0,
 				);
 

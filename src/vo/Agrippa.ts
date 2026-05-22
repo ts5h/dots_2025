@@ -1,4 +1,4 @@
-export const agrippa = [
+export const Agrippa = [
 	[131, 5],
 	[135, 5],
 	[157, 9],

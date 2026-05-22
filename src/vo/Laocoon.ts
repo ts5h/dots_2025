@@ -1,4 +1,4 @@
-export const laocoon = [
+export const Laocoon = [
 	[169, 5],
 	[163, 7],
 	[165, 7],
