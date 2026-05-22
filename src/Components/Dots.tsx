@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef } from "react";
 import { isMobile } from "react-device-detect";
-import { getEasedCoordinates } from "@/functions/getEasedCoordinates";
 import Styles from "@/styles/Dots.module.scss";
 import { useDots } from "@/hooks/useDots";
+import { useEasing } from "@/hooks/useEasing";
 
 export const Dots = () => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -12,6 +12,7 @@ export const Dots = () => {
 	const breakFlag = useRef(false);
 	const requestRef = useRef<number>(undefined);
 
+	const { getEasedCoordinates } = useEasing();
 	const { setDotsArray, setBreakDotsArray, updateDotsArray, getDotsArray } =
 		useDots();
 
@@ -65,7 +66,14 @@ export const Dots = () => {
 		}
 
 		requestRef.current = requestAnimationFrame(animate);
-	}, [canvasWidth, canvasHeight, setDotsArray, updateDotsArray, getDotsArray]);
+	}, [
+		canvasWidth,
+		canvasHeight,
+		setDotsArray,
+		updateDotsArray,
+		getDotsArray,
+		getEasedCoordinates,
+	]);
 
 	const click = useCallback(() => {
 		if (requestRef.current) {

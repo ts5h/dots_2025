@@ -1,3 +1,5 @@
+import { useCallback } from "react";
+
 // function cubicBezier(x1: number, y1: number, x2: number, y2: number) {
 // 	// 3次ベジェの数式
 // 	const ax = 3.0 * x1 - 3.0 * x2 + 1.0;
@@ -64,25 +66,34 @@ type Props = {
 	isBreaking: boolean;
 };
 
-export const getEasedCoordinates = ({
-	startX,
-	startY,
-	endX,
-	endY,
-	duration,
-	currentDuration,
-	isBreaking,
-}: Props) => {
-	const progress = Math.min(currentDuration / duration, 1);
-	const easedProgress = isBreaking
-		? easeOutQuad(progress)
-		: easeInOutQuad(progress);
+export const useEasing = () => {
+	const getEasedCoordinates = useCallback(
+		({
+			startX,
+			startY,
+			endX,
+			endY,
+			duration,
+			currentDuration,
+			isBreaking,
+		}: Props) => {
+			const progress = Math.min(currentDuration / duration, 1);
+			const easedProgress = isBreaking
+				? easeOutQuad(progress)
+				: easeInOutQuad(progress);
 
-	const currentX = startX + (endX - startX) * easedProgress;
-	const currentY = startY + (endY - startY) * easedProgress;
+			const currentX = startX + (endX - startX) * easedProgress;
+			const currentY = startY + (endY - startY) * easedProgress;
+
+			return {
+				currentX,
+				currentY,
+			};
+		},
+		[],
+	);
 
 	return {
-		currentX,
-		currentY,
+		getEasedCoordinates,
 	};
 };
