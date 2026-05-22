@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { isMobile } from "react-device-detect";
+import { isMobile, isTablet } from "react-device-detect";
 import { ArrowBackToHome } from "@/icons";
 import Styles from "@/styles/MenuHome.module.scss";
 
@@ -26,7 +26,7 @@ export const MenuButtonHome = () => {
 	return (
 		<button
 			type="button"
-			className={`${Styles.menu} ${isHover ? Styles.on : ""}`}
+			className={`${Styles.menu} ${isHover ? Styles.on : ""} ${isTablet ? Styles.tablet : ""}`}
 			onMouseOver={() => handleHover(true)}
 			onMouseOut={() => handleHover(false)}
 			onFocus={() => handleHover(true)}
