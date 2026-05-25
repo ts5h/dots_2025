@@ -3,7 +3,11 @@ import { isMobile } from "react-device-detect";
 import { AiFillGithub } from "react-icons/ai";
 import Styles from "@/styles/Menu.module.scss";
 
-export const MenuButtonGitHub = () => {
+type Props = {
+	repositoryUrl?: string;
+};
+
+export const MenuButtonGitHub = ({ repositoryUrl }: Props) => {
 	const [isHover, setIsHover] = useState(false);
 
 	const handleHover = (state: boolean) => {
@@ -17,7 +21,8 @@ export const MenuButtonGitHub = () => {
 	};
 
 	const handleClick = () => {
-		window.open("https://github.com/ts5h/dots");
+		if (!repositoryUrl) return;
+		window.open(repositoryUrl);
 	};
 
 	return (
